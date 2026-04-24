@@ -166,6 +166,9 @@
   @media (max-width: 600px) {
     .prompt-area { padding: 24px 20px 16px; flex-direction: column; gap: 12px; }
   }
+  @media (max-width: 600px) {
+  .progress-row { display: none; }
+}
   .step-icon-num {
     width: 48px; height: 48px;
     border-radius: 14px;
@@ -679,7 +682,6 @@
       <button class="icon-btn" onclick="clearCanvas(3)" aria-label="Clear canvas and start over">↺ Clear</button>
     </div>
     <div class="actions-bar">
-      <div class="drawing-count">Drawing 3 of 7</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="saveAndNext(3)">Ooh, nice! →</button>
       </div>
@@ -711,7 +713,6 @@
       <button class="icon-btn" onclick="clearCanvas(4)" aria-label="Clear canvas and start over">↺ Clear</button>
     </div>
     <div class="actions-bar">
-      <div class="drawing-count">Drawing 4 of 7</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="saveAndNext(4)">Looking good! →</button>
       </div>
@@ -743,7 +744,6 @@
       <button class="icon-btn" onclick="clearCanvas(5)" aria-label="Clear canvas and start over">↺ Clear</button>
     </div>
     <div class="actions-bar">
-      <div class="drawing-count">Drawing 5 of 7</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="saveAndNext(5)">Keep Going! →</button>
       </div>
@@ -775,7 +775,6 @@
       <button class="icon-btn" onclick="clearCanvas(6)" aria-label="Clear canvas and start over">↺ Clear</button>
     </div>
     <div class="actions-bar">
-      <div class="drawing-count">Drawing 6 of 7</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="saveAndNext(6)">One More →</button>
       </div>
@@ -807,7 +806,6 @@
       <button class="icon-btn" onclick="clearCanvas(7)" aria-label="Clear canvas and start over">↺ Clear</button>
     </div>
     <div class="actions-bar">
-      <div class="drawing-count">Drawing 7 of 7</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <button class="btn-primary" onclick="saveAndNext(7)">See My Gallery!</button>
       </div>
