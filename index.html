@@ -206,7 +206,7 @@
     padding: 0 40px 24px;
     position: relative;
   }
-  @media (max-width: 600px) { .canvas-wrapper { padding: 0 16px 16px; } }
+  @media (max-width: 600px) { .canvas-wrapper { padding: 0 12px 16px; } }
 
   .canvas-container {
     border-radius: var(--radius-sm);
@@ -222,6 +222,20 @@
     display: block;
     width: 100%;
     height: auto;
+    /* On mobile, override aspect ratio to be taller */
+  }
+
+  /* On mobile: taller canvas so it's easier to draw */
+  @media (max-width: 600px) {
+    canvas.draw-canvas {
+      /* Force the canvas element to render taller on small screens */
+      aspect-ratio: unset;
+      min-height: 260px;
+    }
+    .canvas-container {
+      /* Make the container take full width and be taller */
+      width: 100%;
+    }
   }
 
   /* Toolbar */
@@ -234,7 +248,7 @@
     border-top: 1px solid var(--border-light);
     flex-wrap: wrap;
   }
-  @media (max-width: 600px) { .toolbar { padding: 12px 16px; } }
+  @media (max-width: 600px) { .toolbar { padding: 10px 12px; gap: 8px; } }
 
   .tool-label {
     font-size: 12px;
@@ -307,7 +321,7 @@
     gap: 12px;
     flex-wrap: wrap;
   }
-  @media (max-width: 600px) { .actions-bar { padding: 16px 20px 24px; } }
+  @media (max-width: 600px) { .actions-bar { padding: 14px 16px 20px; } }
 
   .btn-primary {
     background: var(--purple);
@@ -342,7 +356,7 @@
   .btn-skip:hover { color: var(--text-mid); }
   .btn-skip:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
 
-  /* Drawing count badge */
+  /* Drawing count badge — hidden on mobile */
   .drawing-count {
     font-size: 13px;
     color: var(--text-light);
@@ -350,6 +364,9 @@
     padding: 6px 14px;
     border-radius: 100px;
     font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    .drawing-count { display: none; }
   }
 
   /* Finale screen */
@@ -842,9 +859,7 @@
 </main>
 
 <script>
-const SQUIGGLE_PATH = "M 20 60 C 40 20, 60 80, 90 45 C 110 20, 140 70, 160 50";
 const SQUIGGLE_COLOR = "#ac1ca1";
-const SQUIGGLE_W = 180, SQUIGGLE_H = 90;
 
 const ROUND_COLORS = [null,"#1479d1","#ea0088","#ffa32a","#89d808","#ffca05","#ac1ca1","#ea0088"];
 const ROUND_LABELS = [
@@ -858,9 +873,9 @@ const ROUND_LABELS = [
   "The Wild Card"
 ];
 
+// Removed white (#ffffff) from the palette
 const PALETTE = [
   {hex:"#1a1a2e", label:"Black"},
-  {hex:"#ffffff", label:"White"},
   {hex:"#ac1ca1", label:"Purple"},
   {hex:"#ea0088", label:"Pink"},
   {hex:"#1479d1", label:"Blue"},
@@ -870,17 +885,24 @@ const PALETTE = [
   {hex:"#e83030", label:"Red"},
 ];
 
-const totalDrawingSteps = 7;
-const canvasStates = {}; 
-const eraserState = {};
+const canvasStates = {};
 const savedImages = {};
 let currentStep = 0;
+
+// Returns true if the viewport is "mobile" (narrow)
+function isMobile() {
+  return window.innerWidth <= 600;
+}
+
+// Get the canvas logical height based on screen size
+function getCanvasHeight() {
+  return isMobile() ? 420 : 340;
+}
 
 // Init progress bar
 function buildProgress() {
   const row = document.getElementById('progress-row');
   row.innerHTML = '';
-  // 0 = intro, 1-7 = drawing, 8 = finale
   const total = 9;
   for (let i = 0; i < total; i++) {
     const dot = document.createElement('div');
@@ -906,7 +928,6 @@ function updateProgress(step) {
     const dot = document.getElementById(`pdot-${i}`);
     if (!dot) continue;
     dot.classList.remove('active','done');
-    const stepNum = i === 8 ? 100 : i;
     if (i === step || (step >= 100 && i === 8)) dot.classList.add('active');
     else if (i < step || (step >= 100 && i < 8)) dot.classList.add('done');
     if (i < 8) {
@@ -916,23 +937,27 @@ function updateProgress(step) {
   }
 }
 
-// Draw squiggle on canvas
+// Draw squiggle centered on canvas
 function drawSquiggle(ctx, canvasW, canvasH) {
-  const scaleX = canvasW / 870;
-  const scaleH = canvasH / 340;
-  const scale = Math.min(scaleX, scaleH) * 1.2;
+  // Squiggle SVG coords span roughly x:20–160, y:20–80
+  // We want to scale it to fit nicely and center it
+  const sqW = 140; // path x span (160-20)
+  const sqH = 60;  // path y span (80-20)
 
-  const svgW = SQUIGGLE_W * scale;
-  const svgH = SQUIGGLE_H * scale;
+  // On mobile, use more of the canvas width
+  const targetW = isMobile() ? canvasW * 0.7 : canvasW * 0.35;
+  const scale = targetW / sqW;
 
-  const offsetX = (canvasW - svgW) / 2;
-  const offsetY = (canvasH - svgH) / 2;
+  // Center the squiggle
+  const scaledW = sqW * scale;
+  const scaledH = sqH * scale;
+  const offsetX = (canvasW - scaledW) / 2 - 20 * scale; // subtract path origin x
+  const offsetY = (canvasH - scaledH) / 2 - 20 * scale; // subtract path origin y
 
   ctx.save();
   ctx.translate(offsetX, offsetY);
   ctx.scale(scale, scale);
   ctx.beginPath();
-  // Parse the cubic bezier: M 20 60 C 40 20, 60 80, 90 45 C 110 20, 140 70, 160 50
   ctx.moveTo(20, 60);
   ctx.bezierCurveTo(40, 20, 60, 80, 90, 45);
   ctx.bezierCurveTo(110, 20, 140, 70, 160, 50);
@@ -950,11 +975,9 @@ function setupCanvas(stepNum) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  // Scale for hi-dpi
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
+  const h = getCanvasHeight();
   canvas.width = 870;
-  canvas.height = 340;
+  canvas.height = h;
 
   ctx.fillStyle = '#fafbff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -972,11 +995,10 @@ function setupCanvas(stepNum) {
   const colorContainer = document.getElementById(`color-btns-${stepNum}`);
   if (colorContainer) {
     colorContainer.innerHTML = '';
-    PALETTE.forEach((c, i) => {
+    PALETTE.forEach(c => {
       const btn = document.createElement('button');
       btn.className = 'color-btn';
       btn.style.background = c.hex;
-      if (c.hex === '#ffffff') btn.style.border = '3px solid #ddd';
       btn.setAttribute('aria-label', `${c.label} color`);
       btn.setAttribute('aria-pressed', String(c.hex === canvasStates[stepNum].color));
       btn.addEventListener('click', () => selectColor(stepNum, c.hex, btn, colorContainer));
@@ -994,21 +1016,27 @@ function setupCanvas(stepNum) {
     });
   }
 
+  // Remove old listeners by cloning the canvas
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  const c = document.getElementById(`canvas-${stepNum}`);
+
   // Mouse events
-  canvas.addEventListener('mousedown', e => startDraw(e, stepNum, canvas));
-  canvas.addEventListener('mousemove', e => draw(e, stepNum, canvas));
-  canvas.addEventListener('mouseup', () => stopDraw(stepNum));
-  canvas.addEventListener('mouseleave', () => stopDraw(stepNum));
+  c.addEventListener('mousedown', e => startDraw(e, stepNum, c));
+  c.addEventListener('mousemove', e => draw(e, stepNum, c));
+  c.addEventListener('mouseup', () => stopDraw(stepNum));
+  c.addEventListener('mouseleave', () => stopDraw(stepNum));
 
   // Touch events
-  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0], stepNum, canvas); }, {passive:false});
-  canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0], stepNum, canvas); }, {passive:false});
-  canvas.addEventListener('touchend', () => stopDraw(stepNum));
+  c.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0], stepNum, c); }, {passive:false});
+  c.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0], stepNum, c); }, {passive:false});
+  c.addEventListener('touchend', () => stopDraw(stepNum));
 
-  // Keyboard hint
-  canvas.addEventListener('focus', () => {
-    canvas.title = 'Use your mouse or touch to draw on this canvas.';
-  });
+  // Re-draw squiggle on the new canvas element
+  const ctx2 = c.getContext('2d');
+  ctx2.fillStyle = '#fafbff';
+  ctx2.fillRect(0, 0, c.width, c.height);
+  drawSquiggle(ctx2, c.width, c.height);
 }
 
 function getCanvasPos(e, canvas) {
@@ -1088,7 +1116,6 @@ function clearCanvas(stepNum) {
 }
 
 function goToStep(stepNum) {
-  // Hide all
   document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
   document.getElementById('finale').classList.remove('active');
   const target = document.getElementById(`step-${stepNum}`);
@@ -1098,7 +1125,6 @@ function goToStep(stepNum) {
     updateProgress(stepNum);
     currentStep = stepNum;
     target.scrollIntoView({behavior:'smooth', block:'start'});
-    // Focus the heading
     const heading = target.querySelector('[id^="step"]');
     if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
   }
@@ -1180,18 +1206,7 @@ function restart() {
 
 // Init
 buildProgress();
-// Pre-init step 0 display
 updateProgress(0);
-
-// Keyboard: allow Tab to reach canvas and draw with arrow keys (accessibility hint)
-document.querySelectorAll('.draw-canvas').forEach(c => {
-  c.addEventListener('keydown', e => {
-    if (e.key === ' ' || e.key === 'Enter') {
-      const label = c.getAttribute('aria-label');
-      // Announce drawing mode
-    }
-  });
-});
 </script>
 </body>
 </html>
