@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Divergent Thinking: Creative Possibility Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #ac1ca1;
+    --purple-dark: #8a1582;
+    --yellow: #ffca05;
+    --yellow-dark: #c99e00;
+    --pink: #ea0088;
+    --pink-dark: #bb006d;
+    --blue: #1479d1;
+    --blue-dark: #0f5eaa;
+    --orange: #ffa32a;
+    --orange-dark: #c97d00;
+    --green: #89d808;
+    --green-dark: #5e9700;
+    --bg: #ebecf4;
+    --white: #ffffff;
+    --text-dark: #1a1a2e;
+    --text-mid: #3d3d5c;
+    --text-light: #6b6b8a;
+    --canvas-bg: #fafbff;
+    --border-light: rgba(0,0,0,0.08);
+    --shadow: 0 4px 24px rgba(0,0,0,0.10);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+    color: var(--text-dark);
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* Header */
+  .game-header {
+    width: 100%;
+    max-width: 950px;
+    text-align: center;
+    padding: 36px 0 8px;
+  }
+  .game-header .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--purple);
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .game-header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 900;
+    color: var(--text-dark);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .game-header h1 span { color: var(--purple); }
+  .game-header p {
+    font-size: 16px;
+    color: var(--text-mid);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Progress */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 28px 0 0;
+    width: 100%;
+    max-width: 950px;
+    padding: 0 4px;
+    flex-wrap: wrap;
+  }
+  .progress-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border-light);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .progress-dot.active {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: #fff;
+    transform: scale(1.1);
+  }
+  .progress-dot.done {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--white);
+  }
+  .progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border-light);
+    min-width: 8px;
+    transition: background 0.3s ease;
+  }
+  .progress-line.done { background: var(--green); }
+
+  /* Main card */
+  .game-card {
+    width: 100%;
+    max-width: 950px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Step content */
+  .step-content {
+    display: none;
+  }
+  .step-content.active {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Prompt area */
+  .prompt-area {
+    padding: 32px 40px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  @media (max-width: 600px) {
+    .prompt-area { padding: 24px 20px 16px; flex-direction: column; gap: 12px; }
+  }
+  .step-icon-num {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .step-label {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+  }
+  .prompt-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(17px, 2.5vw, 22px);
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.45;
+  }
+  .prompt-sub {
+    font-size: 14px;
+    color: var(--text-mid);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* Canvas wrapper */
+  .canvas-wrapper {
+    padding: 0 40px 24px;
+    position: relative;
+  }
+  @media (max-width: 600px) { .canvas-wrapper { padding: 0 16px 16px; } }
+
+  .canvas-container {
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border-light);
+    background: var(--canvas-bg);
+    overflow: hidden;
+    cursor: crosshair;
+    position: relative;
+    touch-action: none;
+  }
+
+  canvas.draw-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 40px;
+    background: var(--bg);
+    border-top: 1px solid var(--border-light);
+    flex-wrap: wrap;
+  }
+  @media (max-width: 600px) { .toolbar { padding: 12px 16px; } }
+
+  .tool-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+
+  .color-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+    outline: none;
+  }
+  .color-btn:hover { transform: scale(1.15); }
+  .color-btn.active {
+    border-color: var(--text-dark);
+    transform: scale(1.2);
+  }
+  .color-btn:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  .size-slider {
+    width: 80px;
+    accent-color: var(--purple);
+    cursor: pointer;
+  }
+
+  .tool-sep {
+    width: 1px; height: 24px;
+    background: var(--border-light);
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border-light);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    outline: none;
+  }
+  .icon-btn:hover { background: #f0f0fa; color: var(--text-dark); border-color: var(--purple); }
+  .icon-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  .eraser-active .icon-btn.eraser-btn {
+    background: var(--purple);
+    color: #fff;
+    border-color: var(--purple);
+  }
+
+  /* Actions bar */
+  .actions-bar {
+    padding: 20px 40px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 600px) { .actions-bar { padding: 16px 20px 24px; } }
+
+  .btn-primary {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 14px 36px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    outline: none;
+    white-space: nowrap;
+  }
+  .btn-primary:hover { background: var(--purple-dark); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+  .btn-skip {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    outline: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .btn-skip:hover { color: var(--text-mid); }
+  .btn-skip:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  /* Drawing count badge */
+  .drawing-count {
+    font-size: 13px;
+    color: var(--text-light);
+    background: var(--bg);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-weight: 600;
+  }
+
+  /* Finale screen */
+  .finale-screen {
+    display: none;
+    flex-direction: column;
+    padding: 48px 40px;
+    text-align: center;
+    gap: 0;
+  }
+  @media (max-width: 600px) { .finale-screen { padding: 32px 20px; } }
+  .finale-screen.active { display: flex; }
+
+  .finale-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+  }
+  .finale-screen h2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 900;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .finale-screen h2 .highlight { color: var(--purple); }
+  .finale-intro {
+    font-size: 16px;
+    color: var(--text-mid);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  /* Rules grid */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 0 0 40px;
+    text-align: left;
+  }
+  .rule-card {
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .rule-card:nth-child(1) { background: #f5e6f4; }
+  .rule-card:nth-child(2) { background: #fff6e0; }
+  .rule-card:nth-child(3) { background: #ffeaf5; }
+  .rule-card:nth-child(4) { background: #e6f3ff; }
+  .rule-number {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    line-height: 1;
+  }
+  .rule-card:nth-child(1) .rule-number { color: var(--purple); }
+  .rule-card:nth-child(2) .rule-number { color: var(--orange-dark); }
+  .rule-card:nth-child(3) .rule-number { color: var(--pink-dark); }
+  .rule-card:nth-child(4) .rule-number { color: var(--blue-dark); }
+  .rule-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--text-dark);
+  }
+  .rule-desc {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  .finale-cta-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(17px, 2.5vw, 22px);
+    font-weight: 800;
+    color: var(--text-dark);
+    max-width: 560px;
+    margin: 0 auto 28px;
+    line-height: 1.5;
+  }
+  .finale-cta-text span { color: var(--purple); }
+
+  .gallery-section {
+    margin-bottom: 40px;
+  }
+  .gallery-section h3 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .gallery-item {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid var(--border-light);
+    background: var(--canvas-bg);
+    aspect-ratio: 4/3;
+    position: relative;
+  }
+  .gallery-item img { width: 100%; height: 100%; object-fit: contain; }
+  .gallery-item .gallery-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.92);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mid);
+    padding: 4px 8px;
+    text-align: center;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .btn-restart {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 14px 40px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.15s;
+    outline: none;
+    margin: 0 auto;
+    display: inline-block;
+  }
+  .btn-restart:hover { background: var(--purple-dark); }
+  .btn-restart:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+  /* Confetti */
+  .confetti-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 10px; height: 16px;
+    border-radius: 2px;
+    animation: fall linear forwards;
+    transform-origin: center;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Transition animation */
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .step-content.active, .finale-screen.active {
+    animation: stepIn 0.4s ease forwards;
+  }
+
+  /* Squiggle highlight anim */
+  @keyframes squigglePulse {
+    0%, 100% { filter: drop-shadow(0 0 0px transparent); }
+    50% { filter: drop-shadow(0 0 8px rgba(172,28,161,0.5)); }
+  }
+  .squiggle-svg { animation: squigglePulse 2s ease-in-out 3; }
+
+  /* Canvas drawing cursor */
+  .canvas-container.eraser-mode { cursor: cell; }
+</style>
+</head>
+<body>
+<span class="sr-only" role="heading" aria-level="1">Divergent Thinking: An Interactive Drawing Game</span>
+
+<div class="confetti-container" id="confetti-container" aria-hidden="true"></div>
+
+<header class="game-header" role="banner">
+  <div class="logo-badge" aria-hidden="true">Creative Thinking</div>
+  <h1>Think <span>Divergently</span></h1>
+  <p>Explore the skill of generating lots of ideas - the engine of creativity and innovation.</p>
+</header>
+
+<nav class="progress-row" aria-label="Game progress" id="progress-row"></nav>
+
+<main class="game-card" id="game-card" role="main">
+
+  <!-- INTRO STEP -->
+  <section class="step-content active" id="step-0" aria-labelledby="step0-heading" data-step="0">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--purple);" aria-hidden="true">DT</div>
+      <div>
+        <span class="step-label" style="background:#f5e6f4;color:#7a1274;">What is this?</span>
+        <h2 class="prompt-text" id="step0-heading">Divergent thinking is a superpower.</h2>
+        <p class="prompt-sub">It means thinking in possibilities. It's a core part of creativity, innovation, and problem-solving.</p>
+      </div>
+    </div>
+    <div style="padding:0 40px 32px;">
+      <div style="background:var(--bg);border-radius:var(--radius-sm);padding:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <svg width="180" height="90" viewBox="0 0 180 90" class="squiggle-svg" role="img" aria-label="A curvy squiggle shape" style="flex-shrink:0;">
+          <path d="M 20 60 C 40 20, 60 80, 90 45 C 110 20, 140 70, 160 50" stroke="#ac1ca1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:var(--text-dark);margin-bottom:6px;">Look at this shape.</p>
+          <p style="font-size:14px;color:var(--text-mid);line-height:1.6;">What could it be?</p>
+        </div>
+      </div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn-primary" onclick="goToStep(1)" aria-label="Start drawing activity">I have an idea! →</button>
+    </div>
+  </section>
+
+  <!-- DRAWING STEPS 1-7 -->
+  <section class="step-content" id="step-1" aria-labelledby="step1-heading" data-step="1" data-color="#1479d1">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--blue);" aria-hidden="true">1</div>
+      <div>
+        <span class="step-label" style="background:#e6f3ff;color:#0f5eaa;">Round 1</span>
+        <h2 class="prompt-text" id="step1-heading">Turn it into something!</h2>
+        <p class="prompt-sub">Draw on the squiggle below. Add lines, shapes, color, whatever you like.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-1">
+        <canvas class="draw-canvas" id="canvas-1" width="870" height="340" aria-label="Drawing canvas with a squiggle. Draw on it to turn it into something." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 1">
+      <span class="tool-label" id="colors-label-1">Color</span>
+      <div id="color-btns-1" aria-labelledby="colors-label-1" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-1" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-1" onclick="toggleEraser(1)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(1)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count" aria-live="polite" id="count-1">Drawing 1 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(2)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(1)" aria-label="Save drawing and continue to next round">Nice! Next Round →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-2" aria-labelledby="step2-heading" data-step="2" data-color="#ea0088">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--pink);" aria-hidden="true">2</div>
+      <div>
+        <span class="step-label" style="background:#ffeaf5;color:#990055;">Round 2</span>
+        <h2 class="prompt-text" id="step2-heading">Now, do it again, but turn it into something else.</h2>
+        <p class="prompt-sub">Same shape, different idea.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-2">
+        <canvas class="draw-canvas" id="canvas-2" width="870" height="340" aria-label="Drawing canvas with a squiggle. Turn it into something different from your first idea." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 2">
+      <span class="tool-label" id="colors-label-2">Color</span>
+      <div id="color-btns-2" aria-labelledby="colors-label-2" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-2" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-2" onclick="toggleEraser(2)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(2)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 2 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(3)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(2)">Great! Keep Going →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-3" aria-labelledby="step3-heading" data-step="3" data-color="#ffa32a">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--orange-dark);" aria-hidden="true">3</div>
+      <div>
+        <span class="step-label" style="background:#fff6e0;color:#7a4e00;">Round 3</span>
+        <h2 class="prompt-text" id="step3-heading">Ok, now turn it into something you don't think anyone else would think of.</h2>
+        <p class="prompt-sub">Push your thinking beyond the obvious. Go for something really unique.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-3">
+        <canvas class="draw-canvas" id="canvas-3" width="870" height="340" aria-label="Drawing canvas. Try to think of the most unusual thing to turn this squiggle into." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 3">
+      <span class="tool-label" id="colors-label-3">Color</span>
+      <div id="color-btns-3" aria-labelledby="colors-label-3" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-3" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-3" onclick="toggleEraser(3)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(3)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 3 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(4)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(3)">Ooh, nice! →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-4" aria-labelledby="step4-heading" data-step="4" data-color="#89d808">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--green-dark);" aria-hidden="true">4</div>
+      <div>
+        <span class="step-label" style="background:#eaf3de;color:#3b6d11;">Round 4</span>
+        <h2 class="prompt-text" id="step4-heading">Look around the room and get an idea from something you see.</h2>
+        <p class="prompt-sub">Anything can become inspiration! Use something you see to decide what to draw.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-4">
+        <canvas class="draw-canvas" id="canvas-4" width="870" height="340" aria-label="Drawing canvas. Look around the room and use something you see as inspiration." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 4">
+      <span class="tool-label" id="colors-label-4">Color</span>
+      <div id="color-btns-4" aria-labelledby="colors-label-4" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-4" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-4" onclick="toggleEraser(4)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(4)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 4 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(5)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(4)">Looking good! →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-5" aria-labelledby="step5-heading" data-step="5" data-color="#ffca05">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--yellow-dark);" aria-hidden="true">5</div>
+      <div>
+        <span class="step-label" style="background:#fff9cc;color:#7a6200;">Round 5</span>
+        <h2 class="prompt-text" id="step5-heading">Take that last idea and let it inspire a similar idea.</h2>
+        <p class="prompt-sub">Use your previous drawing as a springboard to spark something new.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-5">
+        <canvas class="draw-canvas" id="canvas-5" width="870" height="340" aria-label="Drawing canvas. Build on your previous idea to make something related but different." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 5">
+      <span class="tool-label" id="colors-label-5">Color</span>
+      <div id="color-btns-5" aria-labelledby="colors-label-5" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-5" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-5" onclick="toggleEraser(5)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(5)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 5 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(6)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(5)">Keep Going! →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-6" aria-labelledby="step6-heading" data-step="6" data-color="#ac1ca1">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--purple);" aria-hidden="true">6</div>
+      <div>
+        <span class="step-label" style="background:#f5e6f4;color:#7a1274;">Round 6</span>
+        <h2 class="prompt-text" id="step6-heading">Draw the idea you rejected.</h2>
+        <p class="prompt-sub">At some point, you probably thought of an idea but didn't draw it. Maybe you judged it as "not good enough." Draw it now.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-6">
+        <canvas class="draw-canvas" id="canvas-6" width="870" height="340" aria-label="Drawing canvas. Draw the idea you almost dismissed. No judgment!" tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 6">
+      <span class="tool-label" id="colors-label-6">Color</span>
+      <div id="color-btns-6" aria-labelledby="colors-label-6" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-6" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-6" onclick="toggleEraser(6)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(6)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 6 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToStep(7)">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(6)">One More →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step-content" id="step-7" aria-labelledby="step7-heading" data-step="7" data-color="#ea0088">
+    <div class="prompt-area">
+      <div class="step-icon-num" style="background:var(--pink);" aria-hidden="true">7</div>
+      <div>
+        <span class="step-label" style="background:#ffeaf5;color:#990055;">Round 7</span>
+        <h2 class="prompt-text" id="step7-heading">One last one. Make it wild.</h2>
+        <p class="prompt-sub">What if you looked at it sideways? There are no rules! Go for it.</p>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div class="canvas-container" id="canvas-container-7">
+        <canvas class="draw-canvas" id="canvas-7" width="870" height="340" aria-label="Final drawing canvas. Make your wildest, most imaginative drawing yet." tabindex="0" role="img"></canvas>
+      </div>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Drawing tools for round 7">
+      <span class="tool-label" id="colors-label-7">Color</span>
+      <div id="color-btns-7" aria-labelledby="colors-label-7" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div class="tool-sep"></div>
+      <span class="tool-label">Size</span>
+      <input type="range" class="size-slider" id="size-7" min="2" max="24" value="5" aria-label="Brush size" step="1">
+      <div class="tool-sep"></div>
+      <button class="icon-btn eraser-btn" id="eraser-7" onclick="toggleEraser(7)" aria-pressed="false" aria-label="Toggle eraser">Eraser</button>
+      <button class="icon-btn" onclick="clearCanvas(7)" aria-label="Clear canvas and start over">↺ Clear</button>
+    </div>
+    <div class="actions-bar">
+      <div class="drawing-count">Drawing 7 of 7</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button class="btn-skip" onclick="goToFinale()">Skip this one</button>
+        <button class="btn-primary" onclick="saveAndNext(7)">See My Gallery!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="finale-screen" id="finale" aria-labelledby="finale-heading">
+    <h2 id="finale-heading"><span class="highlight">Wonderful!</span> You just exercised your divergent thinking.</h2>
+    <p class="finale-intro">You came up with many ideas for the same challenge! That's exactly what divergent thinking is. Generating lots of ideas is how innovation happens!</p>
+
+    <!-- Gallery -->
+    <div class="gallery-section" id="gallery-section" aria-label="Your drawings gallery">
+      <h3>Your Creations</h3>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+
+    <p class="finale-intro" style="margin-bottom:24px;">When you want to be creative, just remember it's already inside you. Just keep in mind these four things you practiced today.</p>
+
+    <!-- Four rules -->
+    <div class="rules-grid" role="list" aria-label="Four rules of divergent thinking">
+      <div class="rule-card" role="listitem">
+        <div class="rule-number" aria-hidden="true">1</div>
+        <div class="rule-title">Go for quantity.</div>
+        <div class="rule-desc">Come up with lots of ideas! You made the same shape into many different things!</div>
+      </div>
+      <div class="rule-card" role="listitem">
+        <div class="rule-number" aria-hidden="true">2</div>
+        <div class="rule-title">Build on ideas.</div>
+        <div class="rule-desc">You used your ideas to spark other ideas. One thought leads to the next!</div>
+      </div>
+      <div class="rule-card" role="listitem">
+        <div class="rule-number" aria-hidden="true">3</div>
+        <div class="rule-title">Seek unusual ideas.</div>
+        <div class="rule-desc">You tried to think of something others wouldn't! Unusual ideas are often the most powerful.</div>
+      </div>
+      <div class="rule-card" role="listitem">
+        <div class="rule-number" aria-hidden="true">4</div>
+        <div class="rule-title">Wait to judge ideas.</div>
+        <div class="rule-desc">You drew even the ideas your inner critic doubted. Evaluating comes later; let your ideas flow.</div>
+      </div>
+    </div>
+
+    <p class="finale-cta-text">Whenever you face a problem or challenge that needs new thinking, know that <span>you are creative!</span></p>
+
+    <button class="btn-restart" onclick="restart()" aria-label="Restart the activity from the beginning">Try Again!</button>
+  </section>
+
+</main>
+
+<script>
+const SQUIGGLE_PATH = "M 20 60 C 40 20, 60 80, 90 45 C 110 20, 140 70, 160 50";
+const SQUIGGLE_COLOR = "#ac1ca1";
+const SQUIGGLE_W = 180, SQUIGGLE_H = 90;
+
+const ROUND_COLORS = [null,"#1479d1","#ea0088","#ffa32a","#89d808","#ffca05","#ac1ca1","#ea0088"];
+const ROUND_LABELS = [
+  null,
+  "First Idea",
+  "Second Idea",
+  "The Unusual",
+  "The Inspired",
+  "Building On",
+  "The Brave Idea",
+  "The Wild Card"
+];
+
+const PALETTE = [
+  {hex:"#1a1a2e", label:"Black"},
+  {hex:"#ffffff", label:"White"},
+  {hex:"#ac1ca1", label:"Purple"},
+  {hex:"#ea0088", label:"Pink"},
+  {hex:"#1479d1", label:"Blue"},
+  {hex:"#ffa32a", label:"Orange"},
+  {hex:"#89d808", label:"Green"},
+  {hex:"#ffca05", label:"Yellow"},
+  {hex:"#e83030", label:"Red"},
+];
+
+const totalDrawingSteps = 7;
+const canvasStates = {}; 
+const eraserState = {};
+const savedImages = {};
+let currentStep = 0;
+
+// Init progress bar
+function buildProgress() {
+  const row = document.getElementById('progress-row');
+  row.innerHTML = '';
+  // 0 = intro, 1-7 = drawing, 8 = finale
+  const total = 9;
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    dot.setAttribute('aria-label', i === 0 ? 'Introduction' : i === 8 ? 'Finale' : `Round ${i}`);
+    if (i === 0) dot.textContent = 'S';
+    else if (i === 8) dot.textContent = 'F';
+    else dot.textContent = i;
+    dot.id = `pdot-${i}`;
+    row.appendChild(dot);
+    if (i < total - 1) {
+      const line = document.createElement('div');
+      line.className = 'progress-line';
+      line.id = `pline-${i}`;
+      row.appendChild(line);
+    }
+  }
+  updateProgress(0);
+}
+
+function updateProgress(step) {
+  for (let i = 0; i < 9; i++) {
+    const dot = document.getElementById(`pdot-${i}`);
+    if (!dot) continue;
+    dot.classList.remove('active','done');
+    const stepNum = i === 8 ? 100 : i;
+    if (i === step || (step >= 100 && i === 8)) dot.classList.add('active');
+    else if (i < step || (step >= 100 && i < 8)) dot.classList.add('done');
+    if (i < 8) {
+      const line = document.getElementById(`pline-${i}`);
+      if (line) line.classList.toggle('done', i < step || (step >= 100));
+    }
+  }
+}
+
+// Draw squiggle on canvas
+function drawSquiggle(ctx, canvasW, canvasH) {
+  const scaleX = canvasW / 870;
+  const scaleH = canvasH / 340;
+  const scale = Math.min(scaleX, scaleH) * 1.2;
+
+  const svgW = SQUIGGLE_W * scale;
+  const svgH = SQUIGGLE_H * scale;
+
+  const offsetX = (canvasW - svgW) / 2;
+  const offsetY = (canvasH - svgH) / 2;
+
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+  ctx.beginPath();
+  // Parse the cubic bezier: M 20 60 C 40 20, 60 80, 90 45 C 110 20, 140 70, 160 50
+  ctx.moveTo(20, 60);
+  ctx.bezierCurveTo(40, 20, 60, 80, 90, 45);
+  ctx.bezierCurveTo(110, 20, 140, 70, 160, 50);
+  ctx.strokeStyle = SQUIGGLE_COLOR;
+  ctx.lineWidth = 4 / scale;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Setup canvas for a step
+function setupCanvas(stepNum) {
+  const canvas = document.getElementById(`canvas-${stepNum}`);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Scale for hi-dpi
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 870;
+  canvas.height = 340;
+
+  ctx.fillStyle = '#fafbff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawSquiggle(ctx, canvas.width, canvas.height);
+
+  canvasStates[stepNum] = {
+    color: ROUND_COLORS[stepNum] || '#1a1a2e',
+    size: 5,
+    eraser: false,
+    drawing: false,
+    lastX: 0, lastY: 0
+  };
+
+  // Build color buttons
+  const colorContainer = document.getElementById(`color-btns-${stepNum}`);
+  if (colorContainer) {
+    colorContainer.innerHTML = '';
+    PALETTE.forEach((c, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'color-btn';
+      btn.style.background = c.hex;
+      if (c.hex === '#ffffff') btn.style.border = '3px solid #ddd';
+      btn.setAttribute('aria-label', `${c.label} color`);
+      btn.setAttribute('aria-pressed', String(c.hex === canvasStates[stepNum].color));
+      btn.addEventListener('click', () => selectColor(stepNum, c.hex, btn, colorContainer));
+      if (c.hex === canvasStates[stepNum].color) btn.classList.add('active');
+      colorContainer.appendChild(btn);
+    });
+  }
+
+  // Size slider
+  const sizeSlider = document.getElementById(`size-${stepNum}`);
+  if (sizeSlider) {
+    sizeSlider.value = 5;
+    sizeSlider.addEventListener('input', () => {
+      if (canvasStates[stepNum]) canvasStates[stepNum].size = parseInt(sizeSlider.value);
+    });
+  }
+
+  // Mouse events
+  canvas.addEventListener('mousedown', e => startDraw(e, stepNum, canvas));
+  canvas.addEventListener('mousemove', e => draw(e, stepNum, canvas));
+  canvas.addEventListener('mouseup', () => stopDraw(stepNum));
+  canvas.addEventListener('mouseleave', () => stopDraw(stepNum));
+
+  // Touch events
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0], stepNum, canvas); }, {passive:false});
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0], stepNum, canvas); }, {passive:false});
+  canvas.addEventListener('touchend', () => stopDraw(stepNum));
+
+  // Keyboard hint
+  canvas.addEventListener('focus', () => {
+    canvas.title = 'Use your mouse or touch to draw on this canvas.';
+  });
+}
+
+function getCanvasPos(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
+
+function startDraw(e, stepNum, canvas) {
+  const state = canvasStates[stepNum];
+  if (!state) return;
+  state.drawing = true;
+  const pos = getCanvasPos(e, canvas);
+  state.lastX = pos.x;
+  state.lastY = pos.y;
+}
+
+function draw(e, stepNum, canvas) {
+  const state = canvasStates[stepNum];
+  if (!state || !state.drawing) return;
+  const ctx = canvas.getContext('2d');
+  const pos = getCanvasPos(e, canvas);
+  ctx.beginPath();
+  ctx.moveTo(state.lastX, state.lastY);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.strokeStyle = state.eraser ? '#fafbff' : state.color;
+  ctx.lineWidth = state.eraser ? state.size * 3 : state.size;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  state.lastX = pos.x;
+  state.lastY = pos.y;
+}
+
+function stopDraw(stepNum) {
+  if (canvasStates[stepNum]) canvasStates[stepNum].drawing = false;
+}
+
+function selectColor(stepNum, hex, btn, container) {
+  if (canvasStates[stepNum]) {
+    canvasStates[stepNum].color = hex;
+    canvasStates[stepNum].eraser = false;
+  }
+  container.querySelectorAll('.color-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
+  const eraserBtn = document.getElementById(`eraser-${stepNum}`);
+  if (eraserBtn) eraserBtn.setAttribute('aria-pressed', 'false');
+  const cont = document.getElementById(`canvas-container-${stepNum}`);
+  if (cont) cont.classList.remove('eraser-mode');
+}
+
+function toggleEraser(stepNum) {
+  const state = canvasStates[stepNum];
+  if (!state) return;
+  state.eraser = !state.eraser;
+  const btn = document.getElementById(`eraser-${stepNum}`);
+  if (btn) btn.setAttribute('aria-pressed', String(state.eraser));
+  const cont = document.getElementById(`canvas-container-${stepNum}`);
+  if (cont) cont.classList.toggle('eraser-mode', state.eraser);
+}
+
+function clearCanvas(stepNum) {
+  const canvas = document.getElementById(`canvas-${stepNum}`);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fafbff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawSquiggle(ctx, canvas.width, canvas.height);
+}
+
+function goToStep(stepNum) {
+  // Hide all
+  document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+  document.getElementById('finale').classList.remove('active');
+  const target = document.getElementById(`step-${stepNum}`);
+  if (target) {
+    target.classList.add('active');
+    if (stepNum > 0) setupCanvas(stepNum);
+    updateProgress(stepNum);
+    currentStep = stepNum;
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+    // Focus the heading
+    const heading = target.querySelector('[id^="step"]');
+    if (heading) { heading.setAttribute('tabindex', '-1'); heading.focus(); }
+  }
+}
+
+function saveAndNext(stepNum) {
+  const canvas = document.getElementById(`canvas-${stepNum}`);
+  if (canvas) {
+    savedImages[stepNum] = canvas.toDataURL('image/png');
+  }
+  if (stepNum < 7) goToStep(stepNum + 1);
+  else goToFinale();
+}
+
+function goToFinale() {
+  document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+  const finale = document.getElementById('finale');
+  finale.classList.add('active');
+  updateProgress(100);
+  buildGallery();
+  triggerConfetti();
+  finale.scrollIntoView({behavior:'smooth', block:'start'});
+  const h = finale.querySelector('#finale-heading');
+  if (h) { h.setAttribute('tabindex','-1'); h.focus(); }
+}
+
+function buildGallery() {
+  const grid = document.getElementById('gallery-grid');
+  grid.innerHTML = '';
+  let count = 0;
+  for (let i = 1; i <= 7; i++) {
+    if (savedImages[i]) {
+      count++;
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.setAttribute('role', 'img');
+      item.setAttribute('aria-label', `Your drawing for round ${i}: ${ROUND_LABELS[i]}`);
+      const img = document.createElement('img');
+      img.src = savedImages[i];
+      img.alt = `Round ${i}: ${ROUND_LABELS[i]}`;
+      const label = document.createElement('div');
+      label.className = 'gallery-label';
+      label.textContent = ROUND_LABELS[i];
+      item.appendChild(img);
+      item.appendChild(label);
+      grid.appendChild(item);
+    }
+  }
+  if (count === 0) {
+    grid.innerHTML = '<p style="color:var(--text-light);font-size:14px;padding:20px;">No drawings saved, but you still exercised your divergent thinking!</p>';
+  }
+}
+
+function triggerConfetti() {
+  const container = document.getElementById('confetti-container');
+  container.innerHTML = '';
+  const colors = ['#ac1ca1','#ffca05','#ea0088','#1479d1','#ffa32a','#89d808'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (8 + Math.random() * 8) + 'px';
+    piece.style.height = (12 + Math.random() * 10) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1.5) + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 5000);
+}
+
+function restart() {
+  Object.keys(savedImages).forEach(k => delete savedImages[k]);
+  Object.keys(canvasStates).forEach(k => delete canvasStates[k]);
+  document.getElementById('finale').classList.remove('active');
+  goToStep(0);
+}
+
+// Init
+buildProgress();
+// Pre-init step 0 display
+updateProgress(0);
+
+// Keyboard: allow Tab to reach canvas and draw with arrow keys (accessibility hint)
+document.querySelectorAll('.draw-canvas').forEach(c => {
+  c.addEventListener('keydown', e => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      const label = c.getAttribute('aria-label');
+      // Announce drawing mode
+    }
+  });
+});
+</script>
+</body>
+</html>
