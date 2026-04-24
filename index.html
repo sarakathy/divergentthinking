@@ -692,7 +692,7 @@
       <div>
         <span class="step-label" style="background:#eaf3de;color:#3b6d11;">Round 4</span>
         <h2 class="prompt-text" id="step4-heading">Look around the room and get an idea from something you see.</h2>
-        <p class="prompt-sub">Anything can become inspiration! Use something you see to decide what to draw.</p>
+        <p class="prompt-sub">Anything can become inspiration!</p>
       </div>
     </div>
     <div class="canvas-wrapper">
@@ -945,7 +945,7 @@ function drawSquiggle(ctx, canvasW, canvasH) {
   const sqH = 60;  // path y span (80-20)
 
   // On mobile, use more of the canvas width
-  const targetW = isMobile() ? canvasW * 0.7 : canvasW * 0.35;
+  const targetW = isMobile() ? canvasW * 0.55 : canvasW * 0.35;
   const scale = targetW / sqW;
 
   // Center the squiggle
